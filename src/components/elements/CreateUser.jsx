@@ -1,17 +1,17 @@
-import React, { useContext } from 'react'
-import Box from '@mui/material/Box'
-import FormControl from '@mui/material/FormControl'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
-import Modal from '@mui/material/Modal'
-import IconButton from '@mui/material/IconButton'
-import IconClose from '@mui/icons-material/Close'
-import { useFormik } from 'formik'
-import * as yup from 'yup'
-import StoreContext from './../store/store'
-import { appendRow } from './../utils/helpers'
+import { useCallback } from 'react';
+import {
+    Box,
+    FormControl,
+    TextField,
+    Button,
+    Grid,
+    Typography,
+    Modal,
+    IconButton,
+} from '@mui/material';
+import IconClose from '@mui/icons-material/Close';
+import { useFormik } from 'formik';
+import { validationSchema } from './../utils/formSchema';
 
 const style = {
     position: 'absolute',
@@ -22,47 +22,42 @@ const style = {
     bgcolor: 'background.paper',
     boxShadow: 24,
     p: 4,
-}
+};
 
-const validationSchema = yup.object({
-    name: yup.string('Enter your full name').required('Full name is required'),
-    email: yup
-        .string('Enter your email')
-        .email('Enter a valid email')
-        .required('Email is required'),
-    company: yup
-        .string('Enter your company name')
-        .min(2, 'Company name should be of minimum 2 characters length')
-        .required('Company is required'),
-})
+function CreateUser({ open, handleClose, handleCreateNewUser }) {
+    //Some memoization to prevent renders
+    const onHandleClose = useCallback(() => {
+        handleClose();
+        formik.resetForm();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-function CreateUser({ open, handleClose }) {
-    const { users, setUsers } = useContext(StoreContext)
     const initialValues = {
         name: '',
         email: '',
         company: '',
-    }
+    };
 
     const formik = useFormik({
         initialValues,
         validationSchema,
         onSubmit: (values) => {
-            const { name, email, company } = values
+            const { name, email, company } = values;
             const data = {
                 name,
                 email,
                 company,
-            }
-            setUsers(appendRow(data, users))
-            handleClose()
+            };
+            handleCreateNewUser(data).then(() => {
+                onHandleClose();
+            });
         },
-    })
+    });
 
     return (
         <Modal
             open={open}
-            onClose={handleClose}
+            onClose={onHandleClose}
             aria-labelledby="modal-modal-title"
         >
             <Box sx={style}>
@@ -83,7 +78,7 @@ function CreateUser({ open, handleClose }) {
                     </Grid>
                     <Grid item xs={4} justifyContent="flex-end">
                         <Grid container justifyContent="flex-end">
-                            <IconButton onClick={handleClose}>
+                            <IconButton onClick={onHandleClose}>
                                 <IconClose />
                             </IconButton>
                         </Grid>
@@ -164,7 +159,7 @@ function CreateUser({ open, handleClose }) {
                 </Box>
             </Box>
         </Modal>
-    )
+    );
 }
 
-export default CreateUser
+export default CreateUser;

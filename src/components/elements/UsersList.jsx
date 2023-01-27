@@ -1,31 +1,28 @@
-import React, { useEffect, useCallback, useContext } from 'react'
-import { DataGrid } from '@mui/x-data-grid'
-import IconButton from '@mui/material/IconButton'
-import DeleteButton from '@mui/icons-material/Delete'
-import StoreContext from './../store/store'
-import { deleteRow } from './../utils/helpers'
+import { useContext } from 'react';
+import { DataGrid } from '@mui/x-data-grid';
+import IconButton from '@mui/material/IconButton';
+import DeleteButton from '@mui/icons-material/Delete';
+import StoreContext from './../store/store';
+import { deleteUser } from './../utils/helpers';
 
 const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'id', headerName: 'ID', width: 70, align: 'center' },
     {
         field: 'name',
         headerName: 'Full name',
         width: 150,
-        sortable: true,
     },
     {
         field: 'email',
         headerName: 'Email',
         width: 200,
-        sortable: true,
     },
     {
         field: 'company',
         headerName: 'Company',
-        width: 280,
-        sortable: true,
+        width: 320,
         valueGetter: (params) => {
-            return params.value.name
+            return params.value.name;
         },
     },
     {
@@ -48,19 +45,18 @@ const columns = [
                 >
                     <DeleteButton />
                 </IconButton>
-            )
+            );
         },
     },
-]
+];
 
 function UsersList({ loading }) {
-    const { users, setUsers } = useContext(StoreContext)
+    const { users, setUsers } = useContext(StoreContext);
 
     const handleOnCellClick = (cell) => {
-        if (cell.field !== 'remove') return
-        console.log(cell)
-        setUsers(deleteRow(cell, users))
-    }
+        if (cell.field !== 'remove') return;
+        setUsers(deleteUser(cell, users));
+    };
 
     return (
         <DataGrid
@@ -74,13 +70,13 @@ function UsersList({ loading }) {
             columns={columns}
             pageSize={10}
             rowsPerPageOptions={[5]}
-            checkboxSelection
             disableSelectionOnClick
             disableColumnSelector
             disableColumnMenu
+            checkboxSelection={false}
             onCellClick={handleOnCellClick}
         />
-    )
+    );
 }
 
-export default UsersList
+export default UsersList;
